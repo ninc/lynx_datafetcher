@@ -1,0 +1,3 @@
+[submodule "BorsdataAPI"]
+	path = BorsdataAPI
+	url = git@github.com:TapeReaderJoe/BorsdataAPI.git

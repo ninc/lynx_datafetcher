@@ -10,5 +10,5 @@ docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE}
 
 # Run in docker
 CMD="python3 src/main.py"
-#TODO use .env for API_KEY
-docker run -it -v ${PROJECT_DIR}:/usr/src/app ${DOCKER_IMAGE}:latest ${CMD}
+ENV_FILE=".env"
+docker run -it --env-file=${ENV_FILE} -v ${PROJECT_DIR}:/usr/src/app ${DOCKER_IMAGE}:latest ${CMD}
