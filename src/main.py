@@ -1,12 +1,11 @@
 #!/bin/python3
 
-from BorsData import BorsData
+from BorsDataClient import BorsDataClient
 
 def main():
 
-    borsdata = BorsData()
-    borsdata.print_api_key()
-    borsdata.print_data()
+    borsdata_client = BorsDataClient()
+    borsdata_client.run()
 
 if __name__ == '__main__':
     main()

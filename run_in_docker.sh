@@ -9,6 +9,16 @@ docker build . -f Dockerfile -t ${DOCKER_IMAGE}
 docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE}
 
 # Run in docker
+DOCKER_DIR="/usr/src/app"
 CMD="python3 src/main.py"
+#export PYTHONPATH="${PYTHONPATH}:."
+#CMD="python3 src/BorsdataAPI/borsdata/borsdata_client.py"
+#CMD="env"
+#CMD="python3 -m site --user-site"
 ENV_FILE=".env"
-docker run -it --env-file=${ENV_FILE} -v ${PROJECT_DIR}:/usr/src/app ${DOCKER_IMAGE}:latest ${CMD}
+
+docker run -it \
+	--env-file=${ENV_FILE} \
+	-e PYTHONPATH=${PYTHONPATH}:/usr/src/app/src/BorsdataAPI/ \
+	-v ${PROJECT_DIR}:${DOCKER_DIR} \
+	${DOCKER_IMAGE}:latest ${CMD}
