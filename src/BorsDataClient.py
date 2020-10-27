@@ -1,14 +1,13 @@
 import os
 import requests
 import time
-from BorsdataAPI.borsdata.borsdata_api import *
+import pandas as pd
 BORSDATA_API_KEY = os.environ.get("BORSDATA_API_KEY")
 
 class BorsDataClient:
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=True):
         self._check_env()
-        self._borsdata_api = BorsdataAPI(BORSDATA_API_KEY)
         self._api_key = BORSDATA_API_KEY
         self._params = {'authKey': self._api_key, 'maxYearCount': 20, 'maxR12QCount': 40, 'maxCount': 20, 'date': None, 'version': 1}
         self._url_root = 'https://apiservice.borsdata.se/v1/'
@@ -43,68 +42,58 @@ class BorsDataClient:
     """
     Instrument Meta
     """
-    def get_branches(self):
+    def get_branches_as_json(self):
         """
         returns branch data as json
         """
         json_data = self._call_api('branches')
         return json_data
 
-    def get_countries(self):
+    def get_countries_as_json(self):
         """
         returns countries data as json
         """
         json_data = self._call_api('countries')
         return json_data
 
-    def get_markets(self):
+    def get_markets_as_json(self):
         """
         returns market data as json
         """
         json_data = self._call_api('markets')
         return json_data
 
-    def get_sectors(self):
+    def get_sectors_as_json(self):
         """
         returns sector data as json
         """
         json_data = self._call_api('sectors')
         return json_data
 
-    def get_translation_meta_data(self):
+    def get_translation_meta_data_as_json(self):
         """
         returns translation metadata as json
         """
-        url = 'translationmetadata'
-        json_data = self._call_api(url)
-        translation_data = pd.json_normalize(json_data['translationMetadatas'])
-        return translation_data
+        json_data = self._call_api('translationmetadata')
+        return json_data
 
     """
     Instruments
     """
-    def get_instruments(self):
+    def get_instruments_as_json(self):
         """
         returns instrument data as json
         """
         url = 'instruments'
         json_data = self._call_api(url)
-        # TODO, DO WE NEED TO NORMALIZE?
-        #instruments = pd.json_normalize(json_data['instruments'])
-        #instruments['listingDate'] = pd.to_datetime(instruments['listingDate'])
-        #return instruments
         return json_data
 
-    def get_instruments_updated(self):
+    def get_instruments_updated_as_json(self):
         """
         returns all updated instruments as json
         """
         url = 'instruments/updated'
         json_data = self._call_api(url)
-        # TODO, DO WE NEED TO NORMALIZE?
-        #instruments = pd.json_normalize(json_data['instruments'])
-        #print(instruments.tail())
-        #return instruments
         return json_data
 
     """
@@ -135,8 +124,7 @@ class BorsDataClient:
         json_data = self._call_api(url)
         return json_data
 
-    # TODO, fix json format
-    def get_kpi_data_instrument(self, ins_id, kpi_id, calc_group, calc):
+    def get_kpi_data_instrument_as_json(self, ins_id, kpi_id, calc_group, calc):
         """
         get screener data, for more information: https://github.com/Borsdata-Sweden/API/wiki/KPI-Screener
         :param ins_id: instrument id
@@ -147,7 +135,6 @@ class BorsDataClient:
         """
         url = f"instruments/{ins_id}/kpis/{kpi_id}/{calc_group}/{calc}"
         json_data = self._call_api(url)
-        print(json_data)
         return json_data
 
     # TODO, fix json format
@@ -174,8 +161,7 @@ class BorsDataClient:
         json_data = self._call_api(url)
         return json_data
 
-    # TODO, fix json format
-    def get_kpi_metadata(self):
+    def get_kpi_metadata_as_json(self):
         """
         get kpi metadata
         :return: json object
@@ -228,15 +214,19 @@ class BorsDataClient:
         reports_r12 = reports_r12.sort_values(['year', 'period'], ascending=True)
         return reports_quarter, reports_year, reports_r12
 
-    # TODO, fix json format
-    def get_reports_metadata(self):
+    def get_instrument_reports_as_json(self, ins_id):
+        url = f'instruments/{ins_id}/reports'
+        json_data = self._call_api(url)
+        return json_data
+
+
+    def get_reports_metadata_as_json(self):
         """
         get report metadata
         :return: pd.DataFrame with metadata
         """
         url = f"instruments/reports/metadata"
         json_data = self._call_api(url)
-        #metadata = pd.DataFrame.from_dict(json_data['reportMetadatas'], orient='columns')
         return json_data
 
     """
@@ -264,6 +254,11 @@ class BorsDataClient:
         stock_prices = stock_prices.sort_index()
         return stock_prices
 
+    def get_instrument_stock_prices_as_json(self, ins_id):
+        url = f'instruments/{ins_id}/stockprices'
+        json_data = self._call_api(url)
+        return json_data
+
     # TODO, fix json format
     def get_instruments_stock_prices_last(self):
         """
@@ -277,6 +272,16 @@ class BorsDataClient:
                                      'o': 'open', 'v': 'volume'}, inplace=True)
         stock_prices.fillna(0, inplace=True)
         return stock_prices
+
+    def get_instruments_stock_prices_last_as_json(self):
+        """
+        get last days' stock prices for all instruments
+        :return: pd.DataFrame()
+        """
+        url = f'/instruments/stockprices/last'
+        json_data = self._call_api(url)
+        return json_data
+
 
     # TODO, fix json format
     def get_stock_prices_date(self, date):

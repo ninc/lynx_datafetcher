@@ -46,23 +46,43 @@ class FireBaseClient:
         }
         return firebase_config
 
+    # TODO FIX GET FUNCTIONS
     def set_instruments(self, data):
-        results = self._db.child('metadata').child('instruments').set(data['instruments'], self._user['idToken'])
+        instruments = self._db.child('borsdata').child('metadata').child('instruments')
+        results = instruments.set(data['instruments'], self._user['idToken'])
 
     def set_countries(self, data):
-        results = self._db.child('metadata').child('countries').set(data['countries'], self._user['idToken'])
+        countries = self._db.child('borsdata').child('metadata').child('countries')
+        results = countries.set(data['countries'], self._user['idToken'])
 
     def set_branches(self, data):
-        results = self._db.child('metadata').child('branches').set(data['branches'], self._user['idToken'])
+        branches = self._db.child('borsdata').child('metadata').child('branches')
+        results = branches.set(data['branches'], self._user['idToken'])
 
     def set_sectors(self, data):
-        results = self._db.child('metadata').child('sectors').set(data['sectors'], self._user['idToken'])
+        sectors = self._db.child('borsdata').child('metadata').child('sectors')
+        results = sectors.set(data['sectors'], self._user['idToken'])
 
     def set_markets(self, data):
-        results = self._db.child('metadata').child('markets').set(data['markets'], self._user['idToken'])
+        markets = self._db.child('borsdata').child('metadata').child('markets')
+        results = markets.set(data['markets'], self._user['idToken'])
 
     def set_kpi_metadata(self, data):
-        results = self._db.child('metadata').child('kpi_metadata').set(data['kpiHistoryMetadatas'], self._user['idToken'])
+        kpi_metadata = self._db.child('borsdata').child('metadata').child('kpi_metadata')
+        results = kpi_metadata.set(data['kpiHistoryMetadatas'], self._user['idToken'])
 
     def set_reports_metadata(self, data):
-        results = self._db.child('metadata').child('reports_metadata').set(data['reportMetadatas'], self._user['idToken'])
+        reports_metadata = self._db.child('borsdata').child('metadata').child('reports_metadata')
+        results = reports_metadata.set(data['reportMetadatas'], self._user['idToken'])
+
+    def set_translation_metadata(self, data):
+        translation_metadata = self._db.child('borsdata').child('metadata').child('translation_metadata')
+        results = translation_metadata.set(data['translationMetadatas'], self._user['idToken'])
+
+    def set_report(self, instrument_id, data):
+        reports = self._db.child('borsdata').child('instrument').child(instrument_id).child('reports')
+        results = reports.set(data, self._user['idToken'])
+
+    def set_stock_prices(self, instrument_id, data):
+        stock_prices = self._db.child('borsdata').child('instrument').child(instrument_id).child('stock_prices')
+        results = stock_prices.set(data, self._user['idToken'])
