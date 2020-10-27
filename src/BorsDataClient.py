@@ -7,7 +7,7 @@ BORSDATA_API_KEY = os.environ.get("BORSDATA_API_KEY")
 class BorsDataClient:
 
     def __init__(self, verbose=False):
-        self._check_api_key()
+        self._check_env()
         self._borsdata_api = BorsdataAPI(BORSDATA_API_KEY)
         self._api_key = BORSDATA_API_KEY
         self._params = {'authKey': self._api_key, 'maxYearCount': 20, 'maxR12QCount': 40, 'maxCount': 20, 'date': None, 'version': 1}
@@ -17,7 +17,7 @@ class BorsDataClient:
         # used for tracing (api-calls in terminal)
         self._verbose = verbose
 
-    def _check_api_key(self):
+    def _check_env(self):
         assert BORSDATA_API_KEY is not None
 
     def _call_api(self, url):
@@ -236,8 +236,8 @@ class BorsDataClient:
         """
         url = f"instruments/reports/metadata"
         json_data = self._call_api(url)
-        metadata = pd.DataFrame.from_dict(json_data['reportMetadatas'], orient='columns')
-        return metadata
+        #metadata = pd.DataFrame.from_dict(json_data['reportMetadatas'], orient='columns')
+        return json_data
 
     """
     Stockprices
@@ -307,12 +307,3 @@ class BorsDataClient:
         stock_splits = pd.json_normalize(json_data['stockSplitList'])
         stock_splits['splitDate'] = pd.to_datetime(stock_splits['splitDate'] )
         return stock_splits
-    
-    def run(self):
-        print('Running stuff')
-        #print(self.get_countries())
-        #print(self.get_branches())
-        #print(self.get_sectors())
-        #print(self.get_markets())
-        print(self.get_instruments())
-        #print(self.get_instruments_updated())
