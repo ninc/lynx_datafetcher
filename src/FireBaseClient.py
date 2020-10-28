@@ -51,6 +51,9 @@ class FireBaseClient:
         instruments = self._db.child('borsdata').child('metadata').child('instruments')
         results = instruments.set(data['instruments'], self._user['idToken'])
 
+    def get_instruments(self):
+        return self._db.child('borsdata').child('metadata').child('instruments').get()
+
     def set_countries(self, data):
         countries = self._db.child('borsdata').child('metadata').child('countries')
         results = countries.set(data['countries'], self._user['idToken'])

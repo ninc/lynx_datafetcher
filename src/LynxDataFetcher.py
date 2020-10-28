@@ -11,9 +11,9 @@ class LynxDataFetcher:
         print('---- Gathering Data from BorsDataAPI ----')
         self.get_meta_data()
         self.set_meta_data()
-        self.set_reports()
-        self.set_stock_prices()
-        self.set_kpi_data()
+        #self.set_reports()
+        #self.set_stock_prices()
+        #self.set_kpi_data()
 
     def get_meta_data(self):
         print('Gathering metadata')
@@ -44,7 +44,6 @@ class LynxDataFetcher:
             print('Uploading report for {} with instrument ID {} to firebase'.format(name, instrument_id))
             reports = self._borsdata_client.get_instrument_reports_as_json(instrument_id)
             self._firebase_client.set_report(instrument_id, reports)
-            return
 
     def set_stock_prices(self):
         for instrument in self._instruments['instruments']:
@@ -53,7 +52,6 @@ class LynxDataFetcher:
             print('Uploading stock prices for {} with instrument ID {} to firebase'.format(name, instrument_id))
             stock_prices = self._borsdata_client.get_instrument_stock_prices_as_json(instrument_id)
             self._firebase_client.set_stock_prices(instrument_id, stock_prices)
-            return
 
     def set_kpi_data(self):
         for instrument in self._instruments['instruments']:
@@ -67,3 +65,10 @@ class LynxDataFetcher:
                 kpi_data = self._borsdata_client.get_kpi_data_instrument_as_json(instrument_id, kpi_id, calc_group, calc)
                 print(kpi_data)
             return
+
+    def add_quality_instruments(self):
+        with open('../kvalitetsbolag.txt') as file:
+            for line in file:
+                for instrument in self._instruments['instrument']:
+                    if instrument['name'] in line:
+                        print('MATCH FOUND {} in {} {}'.format(instrument['name'], line, instrument['insId']))
