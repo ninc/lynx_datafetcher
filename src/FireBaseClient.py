@@ -33,6 +33,9 @@ class FireBaseClient:
         assert FIREBASE_USERNAME is not None
         assert FIREBASE_PASSWORD is not None       
 
+    def _refresh_auth_token(self):
+        self._user = self._auth.refresh(self._user['refreshToken'])
+
     def _create_firebase_config(self):
         firebase_config = {
           "apiKey": FIREBASE_API_KEY,
@@ -46,46 +49,65 @@ class FireBaseClient:
         }
         return firebase_config
 
-    # TODO FIX GET FUNCTIONS
-    def set_instruments(self, data):
-        instruments = self._db.child('borsdata').child('metadata').child('instruments')
-        results = instruments.set(data['instruments'], self._user['idToken'])
 
-    def get_instruments(self):
-        return self._db.child('borsdata').child('metadata').child('instruments').get()
+    """ METADATA """
+    def set_metadata_instruments(self, data):
+        self._refresh_auth_token()
+        for instrument in data['instruments']:
+            instrument_id = instrument['insId']
+            result = self._db.child('borsdata').child('metadata').child('instruments').child(instrument_id).update(instrument, self._user['idToken'])
 
-    def set_countries(self, data):
-        countries = self._db.child('borsdata').child('metadata').child('countries')
-        results = countries.set(data['countries'], self._user['idToken'])
+    def set_metadata_countries(self, data):
+        self._refresh_auth_token()
+        for country in data['countries']:
+            country_id = country['id']
+            result = self._db.child('borsdata').child('metadata').child('countries').child(country_id).update(country, self._user['idToken'])
 
-    def set_branches(self, data):
-        branches = self._db.child('borsdata').child('metadata').child('branches')
-        results = branches.set(data['branches'], self._user['idToken'])
+    def set_metadata_branches(self, data):
+        self._refresh_auth_token()
+        for branch in data['branches']:
+            branch_id = branch['id']
+            result = self._db.child('borsdata').child('metadata').child('branches').child(branch_id).update(branch, self._user['idToken'])
 
-    def set_sectors(self, data):
-        sectors = self._db.child('borsdata').child('metadata').child('sectors')
-        results = sectors.set(data['sectors'], self._user['idToken'])
+    def set_metadata_sectors(self, data):
+        self._refresh_auth_token()
+        for sector in data['sectors']:
+            sector_id = sector['id']
+            result = self._db.child('borsdata').child('metadata').child('sectors').child(sector_id).update(sector, self._user['idToken'])
 
-    def set_markets(self, data):
-        markets = self._db.child('borsdata').child('metadata').child('markets')
-        results = markets.set(data['markets'], self._user['idToken'])
+    def set_metadata_markets(self, data):
+        self._refresh_auth_token()
+        for market in data['markets']:
+            market_id = market['id']
+            result = self._db.child('borsdata').child('metadata').child('markets').child(market_id).update(market, self._user['idToken'])
 
-    def set_kpi_metadata(self, data):
-        kpi_metadata = self._db.child('borsdata').child('metadata').child('kpi_metadata')
-        results = kpi_metadata.set(data['kpiHistoryMetadatas'], self._user['idToken'])
+    def set_metadata_kpi(self, data):
+        self._refresh_auth_token()
+        for kpi in data['kpiHistoryMetadatas']:
+            kpi_id = kpi['kpiId']
+            result = self._db.child('borsdata').child('metadata').child('kpi_metadata').child(kpi_id).update(kpi, self._user['idToken'])
 
-    def set_reports_metadata(self, data):
-        reports_metadata = self._db.child('borsdata').child('metadata').child('reports_metadata')
-        results = reports_metadata.set(data['reportMetadatas'], self._user['idToken'])
+    def set_metadata_reports(self, data):
+        self._refresh_auth_token()
+        results = self._db.child('borsdata').child('metadata').child('reports_metadata').update(data['reportMetadatas'], self._user['idToken'])
 
-    def set_translation_metadata(self, data):
-        translation_metadata = self._db.child('borsdata').child('metadata').child('translation_metadata')
-        results = translation_metadata.set(data['translationMetadatas'], self._user['idToken'])
+    def set_metadata_translation(self, data):
+        self._refresh_auth_token()
+        results = self._db.child('borsdata').child('metadata').child('translation_metadata').update(data['translationMetadatas'], self._user['idToken'])
 
+
+    """ INDIVIDUAL INSTRUMENT DATA """
     def set_report(self, instrument_id, data):
+        self._refresh_auth_token()
         reports = self._db.child('borsdata').child('instrument').child(instrument_id).child('reports')
-        results = reports.set(data, self._user['idToken'])
+        results = reports.update(data, self._user['idToken'])
 
     def set_stock_prices(self, instrument_id, data):
+        self._refresh_auth_token()
         stock_prices = self._db.child('borsdata').child('instrument').child(instrument_id).child('stock_prices')
-        results = stock_prices.set(data, self._user['idToken'])
+        results = stock_prices.update(data, self._user['idToken'])
+
+    """ LYNX SPECIFIC """
+    def set_quality_instrument(self, instrument_id, data):
+        self._refresh_auth_token()
+        results = self._db.child('quality_instruments').child(instrument_id).update(data, self._user['idToken'])
